@@ -2,6 +2,7 @@
 
 #include "Drivetrain.hpp"
 #include "SwerveModule.hpp"
+#include "Test.h"
 
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>

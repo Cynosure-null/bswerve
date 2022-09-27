@@ -17,8 +17,7 @@ void Robot::RobotInit() {}
  * this for items like diagnostics that you want ran during disabled,
  * autonomous, teleoperated and test.
  *
- * <p> This runs after the mode specific periodic functions, but before
- * LiveWindow and SmartDashboard integrated updating.
+ * <p> This runs after the mode specific periodic functions, but before * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {}
 
@@ -39,7 +38,10 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {}
 
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic()
+{
+  SwerveDrive(false);
+  }
 
 void Robot::TestInit() {}
 
@@ -48,8 +50,8 @@ void Robot::TestPeriodic() {}
 
 void Robot::SwerveDrive(bool const &field_relative)
 {
-//  auto const left_right = -frc::ApplyDeadband(BUTTON::PS5.GetX(), 0.08) * Drivetrain::TELEOP_MAX_SPEED;
-//  auto const front_back = -frc::ApplyDeadband(BUTTON::PS5.GetY(), 0.08) * Drivetrain::TELEOP_MAX_SPEED;
+  auto const left_right = -(m_stick.GetLeftX()) * Drivetrain::TELEOP_MAX_SPEED;
+  auto const front_back = -(m_stick.GetLeftY()) * Drivetrain::TELEOP_MAX_SPEED;
   if (m_stick.GetLeftTriggerAxis() >= 0.0)
     {
     Drivetrain::faceDirection(front_back, left_right, 0_deg, field_relative);
@@ -65,8 +67,8 @@ void Robot::SwerveDrive(bool const &field_relative)
   else if (m_stick.GetRightY())
   {
     // Multiplied by 10 to avoid rounding to 0 by the atan2() method
-    double const rotate_joy_x = BUTTON::PS5.GetZ() * 10;
-    double const rotate_joy_y = -BUTTON::PS5.GetTwist() * 10;
+    double const rotate_joy_x = m_stick.GetRightX() * 10;
+    double const rotate_joy_y = -m_stick.GetRightY() * 10;
 
     // If we aren't actually pressing the joystick, leave rotation at previous
     if (std::abs(rotate_joy_x) > 0.1 || std::abs(rotate_joy_y) > 0.1)
@@ -79,7 +81,7 @@ void Robot::SwerveDrive(bool const &field_relative)
   }
   else
   {
-    auto const rot = -frc::ApplyDeadband(BUTTON::PS5.GetZ(), 0.04) * Drivetrain::TELEOP_MAX_ANGULAR_SPEED;
+    auto const rot = -m_stick.GetLeftX() * Drivetrain::TELEOP_MAX_ANGULAR_SPEED;
 
     Drivetrain::drive(front_back, left_right, rot, field_relative);
   }

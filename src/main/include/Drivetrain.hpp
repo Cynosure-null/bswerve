@@ -1,7 +1,14 @@
 #pragma once
 
+
+#include <type_traits>
 #include <wpi/numbers>
+#include <wpi/SymbolExports.h>
+#include "frc/geometry/Rotation2d.h"
+#include "units/angular_velocity.h"
+#include "units/velocity.h"
 #include <frc/kinematics/ChassisSpeeds.h>
+
 #include <frc/kinematics/SwerveModuleState.h>
 #include <wpi/array.h>
 #include <units/acceleration.h>
@@ -15,7 +22,7 @@ namespace Drivetrain
     /******************************************************************/
 
     // Absolute max module speed
-    constexpr units::meters_per_second_t MODULE_MAX_SPEED = 13.9_fps;
+    constexpr units::meters_per_second_t MODULE_MAX_SPEED = 15.0_fps;
 
     /*
     Max effective speed considering pi radians/second max angular speed
