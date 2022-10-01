@@ -4,6 +4,7 @@
 #include "SwerveModule.hpp"
 #include "Test.h"
 
+#include <iostream>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 
@@ -16,6 +17,9 @@ public:
     /******************************************************************/
 
     Robot();
+    void DisabledInit() override;
+    void DisabledPeriodic() override;
+    void DisabledExit() override;
 
     void RobotInit() override;
     void RobotPeriodic() override;

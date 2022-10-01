@@ -3,12 +3,21 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "Robot.hpp"
+#include "Drivetrain.hpp"
+#include "units/angular_velocity.h"
+#include "units/velocity.h"
 
 #include <fmt/core.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
 Robot::Robot(){}
+
+void Robot::DisabledInit() {}
+
+void Robot::DisabledPeriodic() {}
+
+void Robot::DisabledExit() {}
 
 void Robot::RobotInit() {}
 
@@ -36,26 +45,44 @@ void Robot::AutonomousInit() {}
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {}
+void Robot::TeleopInit()
+{
+  Drivetrain::init();
+}
 
 void Robot::TeleopPeriodic()
 {
   SwerveDrive(false);
   }
 
-void Robot::TestInit() {}
+void Robot::TestInit() {
+  Drivetrain::init();
+}
 
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic()
+{
+  // Now introducing Whack-A-Mole.cpp!
+  // A new and revolutionary way to lose your sanity
+  // Now with null more SIGSEVs!
+
+  const units::meters_per_second_t in_x{1.0};
+  const units::meters_per_second_t in_y{1.0};
+  const units::degree_t theta{0.5};
+  // Yes, officer. This line, right here.
+  Drivetrain::faceDirection(in_x, in_y, theta, false);
+}
 
 
 void Robot::SwerveDrive(bool const &field_relative)
 {
-  auto const left_right = -(m_stick.GetLeftX()) * Drivetrain::TELEOP_MAX_SPEED;
-  auto const front_back = -(m_stick.GetLeftY()) * Drivetrain::TELEOP_MAX_SPEED;
+
+  units::meters_per_second_t const left_right = -(m_stick.GetLeftX()) * Drivetrain::TELEOP_MAX_SPEED;
+  units::meters_per_second_t const front_back = -(m_stick.GetLeftY()) * Drivetrain::TELEOP_MAX_SPEED;
   if (m_stick.GetLeftTriggerAxis() >= 0.0)
     {
     Drivetrain::faceDirection(front_back, left_right, 0_deg, field_relative);
     }
+
   else if (m_stick.GetRightTriggerAxis() >= 0.0)
     {
     Drivetrain::faceDirection(front_back, left_right, 180_deg, field_relative);

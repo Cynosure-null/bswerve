@@ -1,5 +1,6 @@
 #include "Drivetrain.hpp"
 #include "SwerveModule.hpp"
+#include "frc/kinematics/ChassisSpeeds.h"
 #include "ngr.hpp"
 
 #include <frc/kinematics/SwerveDriveKinematics.h>
@@ -121,6 +122,7 @@ void Drivetrain::drive(units::meters_per_second_t const &xSpeed,
 {
   auto const speeds = fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getCCWHeading())
                                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot};
+
   drive(speeds);
 }
 
@@ -128,13 +130,14 @@ void Drivetrain::drive(units::meters_per_second_t const &xSpeed,
 void Drivetrain::drive(frc::ChassisSpeeds const &speeds)
 {
   drive(kinematics.ToSwerveModuleStates(speeds));
-
+/*
   if constexpr (debugging)
   {
     frc::SmartDashboard::PutNumber("Target VX Speed", speeds.vx.value());
     frc::SmartDashboard::PutNumber("Target VY Speed", speeds.vy.value());
     frc::SmartDashboard::PutNumber("Target Omega Speed (CCW is +)", units::degrees_per_second_t{speeds.omega}.value() / 720);
   }
+  */
 }
 
 // Sets each module to the desired state
@@ -149,6 +152,7 @@ void Drivetrain::drive(wpi::array<frc::SwerveModuleState, 4> states)
   front_right->setDesiredState(fr);
   back_left->setDesiredState(bl);
   back_right->setDesiredState(br);
+
 
   if constexpr (debugging)
   {
@@ -165,7 +169,8 @@ void Drivetrain::drive(wpi::array<frc::SwerveModuleState, 4> states)
     frc::SmartDashboard::PutString("Actual Front Right Module", fmt::format("Speed (mps): {}, Direction: {}", fr_old.speed.value(), fr_old.angle.Degrees().value()));
     frc::SmartDashboard::PutString("Actual Back Left Module", fmt::format("Speed (mps): {}, Direction: {}", bl_old.speed.value(), bl_old.angle.Degrees().value()));
     frc::SmartDashboard::PutString("Actual Back Right Module", fmt::format("Speed (mps): {}, Direction: {}", br_old.speed.value(), br_old.angle.Degrees().value()));
-  }
+    }
+
 }
 
 void Drivetrain::stop()
@@ -190,9 +195,10 @@ void Drivetrain::faceDirection(units::meters_per_second_t const &dx,
                                double const &rot_p,
                                units::degrees_per_second_t const &max_rot_speed)
 {
-  int error_theta = (theta - getAngle()).to<int>() % 360; // Get difference between old and new angle;
+  // Right below...
+//  int error_theta = (theta - getAngle()).to<int>() % 360; // Get difference between old and new angle;
                                                           // gets the equivalent value between -360 and 360
-
+  int error_theta = theta.to<int>();
   if (error_theta < -180)
     error_theta += 360; // Ensure angle is between -180 and 360
   if (error_theta > 180)
@@ -200,12 +206,12 @@ void Drivetrain::faceDirection(units::meters_per_second_t const &dx,
   if (std::abs(error_theta) < 5)
     error_theta = 0; // Dead-zone to prevent oscillation
 
-  double p_rotation = error_theta * rot_p; // Modifies error_theta in order to get a faster turning speed
-
-  if (std::abs(p_rotation) > max_rot_speed.value())
+ double p_rotation = error_theta * rot_p; // Modifies error_theta in order to get a faster turning speed
+ if (std::abs(p_rotation) > max_rot_speed.value())
     p_rotation = max_rot_speed.value() * ((p_rotation > 0) ? 1 : -1); // Constrains turn speed
 
   // p_rotation is negated since the robot actually turns ccw, not cw
+  // Here is an offending line
   drive(dx, dy, units::degrees_per_second_t{-p_rotation}, field_relative);
 }
 
